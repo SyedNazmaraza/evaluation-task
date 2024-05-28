@@ -1,16 +1,16 @@
-package com.springboot.evaluation_task.entity;
+package com.springboot.evaluation_task.dto;
 
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Order {
-
+public class BaseResponse {
+    private String status;
+    private String message;
+    private Object data;
 }
