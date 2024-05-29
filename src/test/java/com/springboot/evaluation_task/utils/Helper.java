@@ -1,5 +1,6 @@
 package com.springboot.evaluation_task.utils;
 
+import com.springboot.evaluation_task.dto.BaseResponse;
 import com.springboot.evaluation_task.dto.OrderRequest;
 import com.springboot.evaluation_task.entity.Customer;
 import com.springboot.evaluation_task.entity.OrderDetails;
@@ -22,6 +23,41 @@ public class Helper {
     public static OrderRequest getOrderRequest() {
         return OrderRequest.builder()
                 .customerId(1L)
+                .productsIdAndItsQuantities(Map.of(
+                        1L, 2,
+                        2L, 3
+                ))
+                .build();
+    }
+
+    public static OrderRequest getOrderRequestForUpdateAddProducts() {
+        return OrderRequest.builder()
+                .customerId(1L)
+                .addProduct(true)
+                .productsIdAndItsQuantities(Map.of(
+                        1L, 2,
+                        2L, 3
+                ))
+                .build();
+    }
+
+    public static OrderRequest getOrderRequestForUpdateRemoveProducts() {
+        return OrderRequest.builder()
+                .customerId(1L)
+                .addProduct(false)
+                .changeQuantity(false)
+                .removeProduct(true)
+                .productsIdAndItsQuantities(Map.of(
+                        1L, 2,
+                        2L, 3
+                ))
+                .build();
+    }
+
+    public static OrderRequest getOrderRequestForUpdateChangeQuantites() {
+        return OrderRequest.builder()
+                .customerId(1L)
+                .changeQuantity(true)
                 .productsIdAndItsQuantities(Map.of(
                         1L, 2,
                         2L, 3
@@ -66,5 +102,13 @@ public class Helper {
                         .quantity(2)
                         .build()
         );
+    }
+
+    public static BaseResponse createOrderResponse() {
+        return BaseResponse.builder()
+                .status("0")
+                .message("success")
+                .data(ordersList().get(0))
+                .build();
     }
 }

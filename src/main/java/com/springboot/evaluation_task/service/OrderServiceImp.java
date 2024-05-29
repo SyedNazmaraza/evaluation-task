@@ -77,12 +77,12 @@ public class OrderServiceImp implements OrderService {
             for (Product product : products) {
                 if (orderDetailsRepository.deleteByProductId(product.getId()) != 1L)
                     throw new OrderServiceException("Product is not present " + product.getId());
-                return BaseResponse.builder()
-                        .status("0")
-                        .message("Successfully removed")
-                        .data(products)
-                        .build();
             }
+            return BaseResponse.builder()
+                    .status("0")
+                    .message("Successfully removed")
+                    .data(products)
+                    .build();
         }
         if (orderRequest.getChangeQuantity()) {
             for (Product product : products) {
@@ -125,7 +125,7 @@ public class OrderServiceImp implements OrderService {
         return BaseResponse.builder()
                 .status("0")
                 .message("Successfully")
-                .data(orderDetailsRepository.findById(orderId))
+                .data(orderDetailsRepository.findById(orderId).get())
                 .build();
     }
 
