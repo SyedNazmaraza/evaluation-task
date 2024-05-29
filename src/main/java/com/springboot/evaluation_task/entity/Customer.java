@@ -1,5 +1,6 @@
 package com.springboot.evaluation_task.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class Customer {
     private Long id;
     private String name;
     private String email;
-    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.REMOVE)
+    @JsonManagedReference
     private List<Orders> orders;
 }

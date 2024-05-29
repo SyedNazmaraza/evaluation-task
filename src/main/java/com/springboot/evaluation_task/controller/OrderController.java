@@ -4,14 +4,15 @@ import com.springboot.evaluation_task.dto.BaseResponse;
 import com.springboot.evaluation_task.dto.OrderRequest;
 import com.springboot.evaluation_task.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/orders")
-@RequiredArgsConstructor
 public class OrderController {
+    @Autowired
     private OrderService orderService;
 
     @PostMapping("/create")
@@ -22,10 +23,10 @@ public class OrderController {
         );
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<BaseResponse> getAllOrders() {
+    @GetMapping("/getAll/{id}")
+    public ResponseEntity<BaseResponse> getAllOrdersById(@PathVariable Long id) {
         return new ResponseEntity<>(
-                orderService.getOrders(),
+                orderService.getOrders(id),
                 HttpStatus.OK
         );
     }

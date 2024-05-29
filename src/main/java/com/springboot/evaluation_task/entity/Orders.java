@@ -1,5 +1,6 @@
 package com.springboot.evaluation_task.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,5 +18,6 @@ public class Orders {
     private Long id;
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "customer_id",referencedColumnName = "id")
+    @JsonBackReference
     private Customer customer;
 }

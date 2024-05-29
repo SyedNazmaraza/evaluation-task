@@ -11,18 +11,23 @@ import com.springboot.evaluation_task.repository.CustomerRepository;
 import com.springboot.evaluation_task.repository.OrderDetailsRepository;
 import com.springboot.evaluation_task.repository.OrdersRepository;
 import com.springboot.evaluation_task.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Map;
 
 
 @Service
-@RequiredArgsConstructor
 public class OrderServiceImp implements OrderService {
+    @Autowired
     private OrdersRepository ordersRepository;
+    @Autowired
     private OrderDetailsRepository orderDetailsRepository;
+    @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
     private ProductRepository productRepository;
 
     @Override
@@ -30,10 +35,9 @@ public class OrderServiceImp implements OrderService {
         Customer customer = customerRepository.findById(orderRequest.getCustomerId())
                 .orElseThrow(() -> new OrderServiceException("Customer not found"));
         List<Product> productList = validatingProducts(orderRequest.getProductsIdAndItsQuantities());
-        Orders orders = Orders.builder()
+        Orders orders = ordersRepository.save(Orders.builder()
                 .customer(customer)
-                .build();
-        ordersRepository.save(orders);
+                .build());
         for (Product product1 : productList) {
             OrderDetails orderDetails = OrderDetails.builder()
                     .orderId(orders.getId())
@@ -44,12 +48,13 @@ public class OrderServiceImp implements OrderService {
         }
         return BaseResponse.builder()
                 .status("0")
-                .message("success")
+                .message("Created Order")
                 .data(orders)
                 .build();
     }
 
     @Override
+    @Transactional
     public BaseResponse updateOrder(Long orderId, OrderRequest orderRequest) {
         ordersRepository.findById(orderId)
                 .orElseThrow(() -> new OrderServiceException("Order not found"));
@@ -70,17 +75,19 @@ public class OrderServiceImp implements OrderService {
         }
         if (orderRequest.getRemoveProduct()) {
             for (Product product : products) {
-                orderDetailsRepository.deleteByProductId(product.getId());
+                if (orderDetailsRepository.deleteByProductId(product.getId()) != 1L)
+                    throw new OrderServiceException("Product is not present " + product.getId());
+                return BaseResponse.builder()
+                        .status("0")
+                        .message("Successfully removed")
+                        .data(products)
+                        .build();
             }
-            return BaseResponse.builder()
-                    .status("0")
-                    .message("Successfully removed")
-                    .data(products)
-                    .build();
         }
         if (orderRequest.getChangeQuantity()) {
             for (Product product : products) {
-                orderDetailsRepository.deleteByProductId(product.getId());
+                if (orderDetailsRepository.deleteByProductId(product.getId()) != 1L)
+                    throw new OrderServiceException("Product is not present " + product.getId());
                 orderDetailsRepository.save(OrderDetails.builder()
                         .orderId(orderId)
                         .productId(product.getId())
@@ -98,7 +105,9 @@ public class OrderServiceImp implements OrderService {
                 .build();
     }
 
+
     @Override
+    @Transactional
     public BaseResponse deleteOrder(Long orderId) {
         Orders orders = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new OrderServiceException("Order not found"));
@@ -112,8 +121,12 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
-    public BaseResponse getOrders() {
-        return null;
+    public BaseResponse getOrders(Long orderId) {
+        return BaseResponse.builder()
+                .status("0")
+                .message("Successfully")
+                .data(orderDetailsRepository.findById(orderId))
+                .build();
     }
 
     private List<Product> validatingProducts(Map<Long, Integer> productsIdAndItsQuantities) {
