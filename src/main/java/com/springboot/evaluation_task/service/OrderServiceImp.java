@@ -84,15 +84,16 @@ public class OrderServiceImp implements OrderService {
                     .data(products)
                     .build();
         }
+
         if (orderRequest.getChangeQuantity()) {
+            List<OrderDetails> orderDetails = orderDetailsRepository.findByOrderId(orderId);
             for (Product product : products) {
-                if (orderDetailsRepository.deleteByProductId(product.getId()) != 1L)
-                    throw new OrderServiceException("Product is not present " + product.getId());
-                orderDetailsRepository.save(OrderDetails.builder()
-                        .orderId(orderId)
-                        .productId(product.getId())
-                        .quantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()))
-                        .build());
+                orderDetails.forEach(orderDetails1 -> {
+                    if (orderDetails1.getProductId().equals(product.getId())) {
+                        orderDetails1.setQuantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()));
+                        orderDetailsRepository.save(orderDetails1);
+                    }
+                });
             }
             return BaseResponse.builder()
                     .status("0")
@@ -122,10 +123,12 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public BaseResponse getOrders(Long orderId) {
+        OrderDetails orderDetails = orderDetailsRepository.findById(orderId)
+                .orElseThrow(() -> new OrderServiceException("Order not found"));
         return BaseResponse.builder()
                 .status("0")
                 .message("Successfully")
-                .data(orderDetailsRepository.findById(orderId).get())
+                .data(orderDetails)
                 .build();
     }
 

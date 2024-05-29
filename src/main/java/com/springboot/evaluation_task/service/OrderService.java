@@ -7,5 +7,5 @@ public interface OrderService {
     public BaseResponse createOrder(OrderRequest orderRequest);
     public BaseResponse updateOrder(Long orderId ,OrderRequest orderRequest);
     public BaseResponse deleteOrder(Long orderId);
-    BaseResponse getOrders(Long orderId);
+    public BaseResponse getOrders(Long orderId);
 }
