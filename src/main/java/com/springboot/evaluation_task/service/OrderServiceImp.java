@@ -75,7 +75,7 @@ public class OrderServiceImp implements OrderService {
         }
         if (orderRequest.getRemoveProduct()) {
             for (Product product : products) {
-                if (orderDetailsRepository.deleteByProductId(product.getId()) != 1L)
+                if (orderDetailsRepository.deleteByOrderIdAndProductId(orderId,product.getId()) != 1L)
                     throw new OrderServiceException("Product is not present " + product.getId());
             }
             return BaseResponse.builder()
