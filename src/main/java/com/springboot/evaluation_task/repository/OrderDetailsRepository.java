@@ -5,13 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface OrderDetailsRepository extends JpaRepository<OrderDetails,Long> {
-    Long deleteByProductId(Long productId);
-
-    Long deleteByOrderIdAndProductId(Long orderId,Long productId);
-    Long deleteByOrderId(Long orderId);
-
-    List<OrderDetails> findByOrderId(Long orderId);
+public interface OrderDetailsRepository extends JpaRepository<OrderDetails,String> {
+    Long deleteByIdStartingWith(String id);
+    List<OrderDetails> findByIdStartingWith(String id);
 }

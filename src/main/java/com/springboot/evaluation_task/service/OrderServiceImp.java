@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Service
@@ -40,8 +41,7 @@ public class OrderServiceImp implements OrderService {
                 .build());
         for (Product product1 : productList) {
             OrderDetails orderDetails = OrderDetails.builder()
-                    .orderId(orders.getId())
-                    .productId(product1.getId())
+                    .id(String.valueOf(orders.getId() + "_") + String.valueOf(product1.getId()))
                     .quantity(orderRequest.getProductsIdAndItsQuantities().get(product1.getId()))
                     .build();
             orderDetailsRepository.save(orderDetails);
@@ -61,11 +61,19 @@ public class OrderServiceImp implements OrderService {
         List<Product> products = validatingProducts(orderRequest.getProductsIdAndItsQuantities());
         if (orderRequest.getAddProduct()) {
             for (Product product : products) {
-                orderDetailsRepository.save(OrderDetails.builder()
-                        .orderId(orderId)
-                        .productId(product.getId())
-                        .quantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()))
-                        .build());
+                Optional<OrderDetails> orderDetails =orderDetailsRepository.findById((orderId) + "_" + String.valueOf(product.getId()));
+                if (orderDetails.isPresent()){
+                    orderDetailsRepository.save(OrderDetails.builder()
+                            .id(String.valueOf(orderId) + "_" + String.valueOf(product.getId()))
+                            .quantity(orderDetails.get().getQuantity()+orderRequest.getProductsIdAndItsQuantities().get(product.getId()))
+                            .build());
+                }
+                else {
+                    orderDetailsRepository.save(OrderDetails.builder()
+                            .id(String.valueOf(orderId) + "_" + String.valueOf(product.getId()))
+                            .quantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()))
+                            .build());
+                }
             }
             return BaseResponse.builder()
                     .status("0")
@@ -74,9 +82,12 @@ public class OrderServiceImp implements OrderService {
                     .build();
         }
         if (orderRequest.getRemoveProduct()) {
+            System.out.println(orderDetailsRepository.findByIdStartingWith(String.valueOf(orderId)));
+            if (orderDetailsRepository.findByIdStartingWith(String.valueOf(orderId)).size() == 1) {
+                ordersRepository.deleteById(orderId);
+            }
             for (Product product : products) {
-                if (orderDetailsRepository.deleteByOrderIdAndProductId(orderId,product.getId()) != 1L)
-                    throw new OrderServiceException("Product is not present " + product.getId());
+                orderDetailsRepository.deleteById(String.valueOf(orderId) + "_" + String.valueOf(product.getId()));
             }
             return BaseResponse.builder()
                     .status("0")
@@ -86,14 +97,11 @@ public class OrderServiceImp implements OrderService {
         }
 
         if (orderRequest.getChangeQuantity()) {
-            List<OrderDetails> orderDetails = orderDetailsRepository.findByOrderId(orderId);
             for (Product product : products) {
-                orderDetails.forEach(orderDetails1 -> {
-                    if (orderDetails1.getProductId().equals(product.getId())) {
-                        orderDetails1.setQuantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()));
-                        orderDetailsRepository.save(orderDetails1);
-                    }
-                });
+                OrderDetails orderDetails1 = orderDetailsRepository.findById(String.valueOf(orderId) + "_" + String.valueOf(product.getId()))
+                        .orElseThrow(() -> new OrderServiceException("Order with the product " + product.getId() + " is not found"));
+                orderDetails1.setQuantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()));
+                orderDetailsRepository.save(orderDetails1);
             }
             return BaseResponse.builder()
                     .status("0")
@@ -113,7 +121,7 @@ public class OrderServiceImp implements OrderService {
         Orders orders = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new OrderServiceException("Order not found"));
         ordersRepository.deleteById(orderId);
-        orderDetailsRepository.deleteByOrderId(orderId);
+        orderDetailsRepository.deleteByIdStartingWith(String.valueOf(orderId));
         return BaseResponse.builder()
                 .status("0")
                 .message("Successfully deleted")
@@ -123,8 +131,7 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     public BaseResponse getOrders(Long orderId) {
-        OrderDetails orderDetails = orderDetailsRepository.findById(orderId)
-                .orElseThrow(() -> new OrderServiceException("Order not found"));
+        List<OrderDetails> orderDetails = orderDetailsRepository.findByIdStartingWith(String.valueOf(orderId));
         return BaseResponse.builder()
                 .status("0")
                 .message("Successfully")

@@ -16,9 +16,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrderDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private Long orderId;
-    private Long productId;
+    private String id;
     private int quantity;
 }
