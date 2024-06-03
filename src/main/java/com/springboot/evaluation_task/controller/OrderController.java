@@ -3,16 +3,15 @@ package com.springboot.evaluation_task.controller;
 import com.springboot.evaluation_task.dto.BaseResponse;
 import com.springboot.evaluation_task.dto.OrderRequest;
 import com.springboot.evaluation_task.service.OrderService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/orders")
+@AllArgsConstructor
 public class OrderController {
-    @Autowired
     private OrderService orderService;
 
     @PostMapping("/create")

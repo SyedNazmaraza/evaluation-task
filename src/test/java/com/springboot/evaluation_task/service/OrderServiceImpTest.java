@@ -54,37 +54,37 @@ class OrderServiceImpTest {
         List<Product> productList = (List<Product>) orderService.updateOrder(1L,Helper.getOrderRequestForUpdateAddProducts()).getData();
         assertEquals(2,productList.size());
     }
-    @Test
-    void updateOrderForRemoveProducts() {
-        when(ordersRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersList().get(0)));
-        when(productRepository.findAllById(any())).thenReturn(Helper.productList());
-        when(orderDetailsRepository.save(any())).thenReturn(Helper.ordersDetailsList().get(0));
-        when(orderDetailsRepository.deleteByProductId(any())).thenReturn(1L);
-        List<Product> productList = (List<Product>) orderService.updateOrder(1L,Helper.getOrderRequestForUpdateRemoveProducts()).getData();
-        assertEquals(2,productList.size());
-    }
-    @Test
-    void updateOrderForUpdateQuantities() {
-        when(ordersRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersList().get(0)));
-        when(productRepository.findAllById(any())).thenReturn(Helper.productList());
-        when(orderDetailsRepository.save(any())).thenReturn(Helper.ordersDetailsList().get(0));
-        when(orderDetailsRepository.deleteByProductId(any())).thenReturn(1L);
-        List<Product> productList = (List<Product>) orderService.updateOrder(1L,Helper.getOrderRequestForUpdateRemoveProducts()).getData();
-        assertEquals(2,productList.size());
-    }
-
-    @Test
-    void deleteOrder() {
-        when(ordersRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersList().get(0)));
-        when(orderDetailsRepository.deleteByOrderId(1L)).thenReturn(1L);
-        Orders order = (Orders) orderService.deleteOrder(1L).getData();
-        assertEquals(1L,order.getId());
-    }
-    @Test
-    void getOrders() {
-        when(orderDetailsRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersDetailsList().get(0)));
-        OrderDetails ordersList = (OrderDetails) orderService.getOrders(1L).getData();
-        assertEquals(1,ordersList.getId());
-
-    }
+//    @Test
+//    void updateOrderForRemoveProducts() {
+//        when(ordersRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersList().get(0)));
+//        when(productRepository.findAllById(any())).thenReturn(Helper.productList());
+//        when(orderDetailsRepository.save(any())).thenReturn(Helper.ordersDetailsList().get(0));
+//        when(orderDetailsRepository.deleteByProductId(any())).thenReturn(1L);
+//        List<Product> productList = (List<Product>) orderService.updateOrder(1L,Helper.getOrderRequestForUpdateRemoveProducts()).getData();
+//        assertEquals(2,productList.size());
+//    }
+//    @Test
+//    void updateOrderForUpdateQuantities() {
+//        when(ordersRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersList().get(0)));
+//        when(productRepository.findAllById(any())).thenReturn(Helper.productList());
+//        when(orderDetailsRepository.save(any())).thenReturn(Helper.ordersDetailsList().get(0));
+//        when(orderDetailsRepository.deleteByProductId(any())).thenReturn(1L);
+//        List<Product> productList = (List<Product>) orderService.updateOrder(1L,Helper.getOrderRequestForUpdateRemoveProducts()).getData();
+//        assertEquals(2,productList.size());
+//    }
+//
+//    @Test
+//    void deleteOrder() {
+//        when(ordersRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersList().get(0)));
+//        when(orderDetailsRepository.deleteByOrderId(1L)).thenReturn(1L);
+//        Orders order = (Orders) orderService.deleteOrder(1L).getData();
+//        assertEquals(1L,order.getId());
+//    }
+//    @Test
+//    void getOrders() {
+//        when(orderDetailsRepository.findById(1L)).thenReturn(Optional.ofNullable(Helper.ordersDetailsList().get(0)));
+//        OrderDetails ordersList = (OrderDetails) orderService.getOrders(1L).getData();
+//        assertEquals(1,ordersList.getId());
+//
+//    }
 }

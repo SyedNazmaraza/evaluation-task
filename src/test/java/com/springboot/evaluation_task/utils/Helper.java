@@ -96,9 +96,7 @@ public class Helper {
     public static List<OrderDetails> ordersDetailsList() {
         return List.of(
                 OrderDetails.builder()
-                        .id(1L)
-                        .orderId(1L)
-                        .productId(1L)
+                        .id("1_1")
                         .quantity(2)
                         .build()
         );

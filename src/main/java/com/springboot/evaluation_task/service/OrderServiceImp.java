@@ -1,5 +1,4 @@
 package com.springboot.evaluation_task.service;
-
 import com.springboot.evaluation_task.advice.OrderServiceException;
 import com.springboot.evaluation_task.dto.BaseResponse;
 import com.springboot.evaluation_task.dto.OrderRequest;
@@ -12,23 +11,19 @@ import com.springboot.evaluation_task.repository.OrderDetailsRepository;
 import com.springboot.evaluation_task.repository.OrdersRepository;
 import com.springboot.evaluation_task.repository.ProductRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
 @Service
+@AllArgsConstructor
 public class OrderServiceImp implements OrderService {
-    @Autowired
     private OrdersRepository ordersRepository;
-    @Autowired
     private OrderDetailsRepository orderDetailsRepository;
-    @Autowired
     private CustomerRepository customerRepository;
-    @Autowired
     private ProductRepository productRepository;
 
     @Override
@@ -41,7 +36,7 @@ public class OrderServiceImp implements OrderService {
                 .build());
         for (Product product1 : productList) {
             OrderDetails orderDetails = OrderDetails.builder()
-                    .id(String.valueOf(orders.getId() + "_") + String.valueOf(product1.getId()))
+                    .id(orders.getId() + "_" + product1.getId())
                     .quantity(orderRequest.getProductsIdAndItsQuantities().get(product1.getId()))
                     .build();
             orderDetailsRepository.save(orderDetails);
@@ -61,16 +56,16 @@ public class OrderServiceImp implements OrderService {
         List<Product> products = validatingProducts(orderRequest.getProductsIdAndItsQuantities());
         if (orderRequest.getAddProduct()) {
             for (Product product : products) {
-                Optional<OrderDetails> orderDetails =orderDetailsRepository.findById((orderId) + "_" + String.valueOf(product.getId()));
+                Optional<OrderDetails> orderDetails =orderDetailsRepository.findById((orderId) + "_" + product.getId());
                 if (orderDetails.isPresent()){
                     orderDetailsRepository.save(OrderDetails.builder()
-                            .id(String.valueOf(orderId) + "_" + String.valueOf(product.getId()))
+                            .id(orderId + "_" + product.getId())
                             .quantity(orderDetails.get().getQuantity()+orderRequest.getProductsIdAndItsQuantities().get(product.getId()))
                             .build());
                 }
                 else {
                     orderDetailsRepository.save(OrderDetails.builder()
-                            .id(String.valueOf(orderId) + "_" + String.valueOf(product.getId()))
+                            .id(orderId + "_" + product.getId())
                             .quantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()))
                             .build());
                 }
@@ -87,7 +82,7 @@ public class OrderServiceImp implements OrderService {
                 ordersRepository.deleteById(orderId);
             }
             for (Product product : products) {
-                orderDetailsRepository.deleteById(String.valueOf(orderId) + "_" + String.valueOf(product.getId()));
+                orderDetailsRepository.deleteById(orderId + "_" + product.getId());
             }
             return BaseResponse.builder()
                     .status("0")
@@ -98,7 +93,7 @@ public class OrderServiceImp implements OrderService {
 
         if (orderRequest.getChangeQuantity()) {
             for (Product product : products) {
-                OrderDetails orderDetails1 = orderDetailsRepository.findById(String.valueOf(orderId) + "_" + String.valueOf(product.getId()))
+                OrderDetails orderDetails1 = orderDetailsRepository.findById(orderId + "_" + product.getId())
                         .orElseThrow(() -> new OrderServiceException("Order with the product " + product.getId() + " is not found"));
                 orderDetails1.setQuantity(orderRequest.getProductsIdAndItsQuantities().get(product.getId()));
                 orderDetailsRepository.save(orderDetails1);
